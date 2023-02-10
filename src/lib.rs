@@ -2,6 +2,7 @@ use stylist::{Style};
 use yew::prelude::*;
 use yew::{ html, Html};
 
+
 const STYLE_FILE: &str = include_str!("min.css");
 const STYLE_RES: &str = include_str!("restart.css");
 pub fn hello() {
@@ -10,12 +11,14 @@ pub fn hello() {
 
 pub enum Msg {
     Turn(usize), 
+    Start,
 }
 pub struct Field {
     pub arr: [u8; 9],
     pub p: u8, 
     pub draw: [char; 9],
     pub count: u8,
+    pub start: bool,
 }
 impl Component for Field {
     type Message = Msg;
@@ -34,21 +37,24 @@ impl Component for Field {
                     self.p = temp;
                 }
                 
-                true 
+                true
+            }
+
+            Msg::Start => {
+                self.start = true;
+                true
             }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
        
-
-
         let stylesheet = Style::new(STYLE_FILE).unwrap();
         let stylesheet2 = Style::new(STYLE_RES).unwrap();
         let mut field = Vec::new();
 
         let link = ctx.link();
-        if self.check() {
+        if self.check() && self.start{
             html! {
                 <div class={stylesheet2}>
                 <p>{format!("player {} won", self.p)} <br/>
@@ -65,7 +71,7 @@ impl Component for Field {
                 </div>
             }
         }
-        else if self.count >= 9{
+        else if self.count >= 9 && self.start{
             html! {
                 <div class={stylesheet2}>
                     <p>{"nobody won"} <br/>
@@ -82,7 +88,7 @@ impl Component for Field {
                 </div>
             }
         }
-        else {
+        else if self.start{
 
             for i in (0..9).step_by(3) {
                 let l = i.clone();
@@ -96,7 +102,7 @@ impl Component for Field {
                     </div> 
                 } 
                 );
-        
+            
             }
             
             html! {
@@ -107,6 +113,21 @@ impl Component for Field {
                 </div>
             }
 
+
+        }
+
+        else {
+            
+            html! {
+                <div class={stylesheet}>
+                    <div  class="container">
+                    
+                    <button align="center" class="button2" onclick={link.callback(move|_| Msg::Start)}>{"Start"}</button>
+                    
+                    </div>
+                </div>
+
+            }
         }
     }
 }
@@ -117,6 +138,7 @@ impl Field {
             p: 1, 
             draw: [' '; 9],
             count: 0,
+            start: false,
         }
     }
     pub fn turn(&mut self, turn:usize) {
