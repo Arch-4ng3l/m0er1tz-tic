@@ -11,4 +11,3 @@ stylist = {version="0.12.0", features=["yew", "parser"]}
 web-sys = "0.3.61"
 yew = {version = "0.20.0", features=["csr"]}
 getrandom = { version = "0.2", features = ["js"] }
-wasm-timer = "0.2.5"
