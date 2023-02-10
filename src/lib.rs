@@ -1,8 +1,7 @@
 use stylist::{Style};
 use yew::prelude::*;
 use yew::{ html, Html};
-
-
+use rand::prelude::*;
 const STYLE_FILE: &str = include_str!("min.css");
 const STYLE_RES: &str = include_str!("restart.css");
 pub fn hello() {
@@ -28,15 +27,33 @@ impl Component for Field {
         Field::new()
     }
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        let mut rng = rand::thread_rng();
+        let mut random  = rng.gen_range(0..9);
+        
         match msg {
             Msg::Turn(i) => {
-                let temp = self.p; 
-                self.turn(i);
+                if self.arr[i] == 0 {
+                    self.turn(i);
+                
+                
+
 
                 if self.check() {
-                    self.p = temp;
+                    self.p = 1;
                 }
-                
+                else if self.count != 9 {
+
+                    while self.arr[random] != 0 {
+                        random  = rng.gen_range(0..9);
+                    }
+                    self.turn(random); 
+
+                    if self.check(){
+                        self.p = 2;
+                    }
+                }
+
+                }
                 true
             }
 
@@ -48,13 +65,15 @@ impl Component for Field {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-       
+
         let stylesheet = Style::new(STYLE_FILE).unwrap();
         let stylesheet2 = Style::new(STYLE_RES).unwrap();
         let mut field = Vec::new();
-
         let link = ctx.link();
+
+
         if self.check() && self.start{
+
             html! {
                 <div class={stylesheet2}>
                 <p>{format!("player {} won", self.p)} <br/>
@@ -79,8 +98,6 @@ impl Component for Field {
                     <span class="fancy" >
                         {"refresh to play again"}
                     </span>
-                        
-                    
                     <form>
                     <input class="button" type="button" onClick="history.go(0)" value="Refresh"/>
                     </form>
@@ -94,11 +111,9 @@ impl Component for Field {
                 let l = i.clone();
                 field.push(html!{
                     <div class="container">
-                        
                         <button class="button" onclick={link.callback(move|_| Msg::Turn(l.clone()))}>{self.draw[i]}</button>
                         <button class="button" onclick={link.callback(move|_| Msg::Turn((l+1).clone()))}>{self.draw[i+1]}</button> 
                         <button class="button" onclick={link.callback(move|_| Msg::Turn((l+2).clone()))}>{self.draw[i+2]}</button> 
-                        
                     </div> 
                 } 
                 );
